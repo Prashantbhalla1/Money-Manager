@@ -42,13 +42,16 @@ public class ProfileService {
      }
 ProfileEntity profileEntity=toEntity(profileDto);
 profileEntity.setActivatedToken(UUID.randomUUID().toString());
- profileEntity= profileRepository.save(profileEntity);
+
  String activationUrl=url+"/activate?token="+profileEntity.getActivatedToken();
  String subject="Activate ";
-
-emailService.sendEmail(profileEntity.getEmail(),subject,activationUrl);
-
-
+try {
+    emailService.sendEmail(profileEntity.getEmail(), subject, activationUrl);
+}
+catch (Exception e){
+    profileEntity.setIsActive(true);
+}
+        profileEntity= profileRepository.save(profileEntity);
         return toDto(profileEntity);
     }
     public ProfileEntity toEntity(ProfileDto profileDto){
